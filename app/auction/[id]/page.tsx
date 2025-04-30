@@ -18,7 +18,6 @@ import { Check } from "lucide-react"
 export default function AuctionDetailPage({ params }: { params: { id: string } }) {
     const [bidAmount, setBidAmount] = useState("")
 
-    // This would normally come from an API call using the ID
     const auction = {
         id: params.id,
         title: "애플 에어팟 프로 2세대",
