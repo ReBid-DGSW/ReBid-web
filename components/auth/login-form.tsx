@@ -4,19 +4,16 @@ import type React from "react"
 
 import { useState } from "react"
 import Link from "next/link"
-import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Checkbox } from "@/components/ui/checkbox"
 import { Separator } from "@/components/ui/separator"
-import { AlertCircle, Loader2 } from "lucide-react"
-import { Alert, AlertDescription } from "@/components/ui/alert"
+import { Loader2 } from "lucide-react"
+import { useAuth } from "@/hooks/use-auth"
 
 export default function LoginForm() {
-    const router = useRouter()
-    const [isLoading, setIsLoading] = useState(false)
-    const [error, setError] = useState<string | null>(null)
+    const { login, isLoggingIn } = useAuth()
     const [formData, setFormData] = useState({
         email: "",
         password: "",
@@ -26,7 +23,6 @@ export default function LoginForm() {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target
         setFormData((prev) => ({ ...prev, [name]: value }))
-        setError(null)
     }
 
     const handleCheckboxChange = (checked: boolean) => {
@@ -35,28 +31,11 @@ export default function LoginForm() {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault()
-        setIsLoading(true)
-        setError(null)
-
-        try {
-            await new Promise((resolve) => setTimeout(resolve, 1500))
-            router.push("/")
-        } catch (err) {
-            setError("로그인에 실패했습니다. 이메일과 비밀번호를 확인해주세요.")
-        } finally {
-            setIsLoading(false)
-        }
+        login(formData)
     }
 
     return (
         <div className="space-y-6">
-            {error && (
-                <Alert variant="destructive">
-                    <AlertCircle className="h-4 w-4" />
-                    <AlertDescription>{error}</AlertDescription>
-                </Alert>
-            )}
-
             <form onSubmit={handleSubmit} className="space-y-4">
                 <div className="space-y-2">
                     <Label htmlFor="email">이메일</Label>
@@ -69,7 +48,7 @@ export default function LoginForm() {
                         required
                         value={formData.email}
                         onChange={handleChange}
-                        disabled={isLoading}
+                        disabled={isLoggingIn}
                     />
                 </div>
 
@@ -89,7 +68,7 @@ export default function LoginForm() {
                         required
                         value={formData.password}
                         onChange={handleChange}
-                        disabled={isLoading}
+                        disabled={isLoggingIn}
                     />
                 </div>
 
@@ -98,15 +77,15 @@ export default function LoginForm() {
                         id="remember-me"
                         checked={formData.rememberMe}
                         onCheckedChange={handleCheckboxChange}
-                        disabled={isLoading}
+                        disabled={isLoggingIn}
                     />
                     <Label htmlFor="remember-me" className="text-sm font-normal cursor-pointer">
                         로그인 상태 유지
                     </Label>
                 </div>
 
-                <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={isLoading}>
-                    {isLoading ? (
+                <Button type="submit" className="w-full bg-primary hover:bg-primary/90" disabled={isLoggingIn}>
+                    {isLoggingIn ? (
                         <>
                             <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                             로그인 중...
@@ -127,7 +106,7 @@ export default function LoginForm() {
             </div>
 
             <div className="grid gap-3">
-                <Button variant="outline" type="button" disabled={isLoading}>
+                <Button variant="outline" type="button" disabled={isLoggingIn}>
                     <svg className="mr-2 h-4 w-4" viewBox="0 0 24 24">
                         <path
                             d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -148,7 +127,7 @@ export default function LoginForm() {
                     </svg>
                     Google 계정으로 로그인
                 </Button>
-                <Button variant="outline" type="button" disabled={isLoading}>
+                <Button variant="outline" type="button" disabled={isLoggingIn}>
                     <svg className="mr-2 h-4 w-4" fill="currentColor" viewBox="0 0 24 24">
                         <path d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" />
                     </svg>
