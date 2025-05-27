@@ -106,7 +106,7 @@ export const authAPI = {
             throw new Error("비밀번호 재설정 이메일 전송에 실패했습니다.")
         }
     },
-    
+
     refreshToken: async (): Promise<AuthResponse> => {
         const refreshToken = localStorage.getItem("refreshToken")
 
